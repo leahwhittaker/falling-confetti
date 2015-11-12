@@ -13,7 +13,7 @@
 </head>
 <body>
     <script src="three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenLite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
 
     <script>
 
@@ -36,35 +36,24 @@
             camera.position.z = 400;
 
             var planes = [];
-            var planeColors = [0xDBDBD2, 0xFCE7DD, 0xF0E4C9, 0xF0E4C9, 0xFCBD8D];
+            var planeColors = [0xDBDBD2, 0xFCE7DD, 0xF0E4C9, 0xF0E4C9, 0xFCBD8D, 0xE3C47C];
             var lastPosX = 0;
             var lastPosY = -window.innerHeight/2;//0;
 
             for (var i = 0 ; i < 10000; i++) {
 
                 // create a geometry
-                var geometry = new THREE.Geometry();
-
-                var random1 = 0;
-                var random2 = -5;
-                var random3 = 5;
-                var random4 = 5;
-                var random5 = -5;
-                var random6 = 5;
-
-                geometry.vertices.push(
-                        new THREE.Vector3(random1, random2, 0),
-                        new THREE.Vector3(random3, random4, 0),
-                        new THREE.Vector3(random5, random6, 0)
-                );
-
-                geometry.faces.push(new THREE.Face3(0, 1, 2));
-
-                geometry.computeBoundingSphere();
+                var geometry = new THREE.BoxGeometry( 5, 5, 0.1 );
 
                 // add a material to the mesh
                 var randomColor = planeColors[Math.floor(Math.random()*planeColors.length)];
-                var material = new THREE.MeshBasicMaterial({color: randomColor, side: THREE.DoubleSide});
+
+                var material;
+                if (randomColor == 0x98782c) {
+                    material = new THREE.MeshPhongMaterial({color: randomColor, emissive:0x111102, specular:randomColor, shininess:100});
+                } else {
+                    material = new THREE.MeshBasicMaterial({color: randomColor});
+                }
 
                 // create a mesh by combining the geometry and material
                 var plane = new THREE.Mesh(geometry, material);
@@ -73,7 +62,7 @@
                     lastPosY += 20;
                 }
                 plane.position.x = lastPosX + 10 + Math.random() * 10;
-                plane.position.y = lastPosY + Math.random() * 10 - 8;
+                plane.position.y = lastPosY + Math.random() * 20 - 10;
                 plane.rotation.z = (Math.random() * 360) * (Math.PI/180);
 
                 lastPosX = plane.position.x;
@@ -88,12 +77,13 @@
 
                 var delay = Math.random()*2.5;
                 if (delay > 2.45) {
-                    delay += 2 * Math.random();
+                    delay += 1.5 * Math.random();
                 }
-                TweenLite.from(plane.position, 5, {z:410, ease:"Power3.easeIn", delay:delay});
-                TweenLite.from(plane.rotation, 5, {x:Math.random()*100, y:Math.random()*100, z:Math.random()*100, ease:"Linear.easeNone", delay:delay, onCompleteParams:[plane], onComplete:function(p) {
+                TweenMax.from(plane.position, 4.5, {y:200, z:410, ease:"Power3.easeIn", delay:delay});
+                TweenMax.from(plane.rotation, 4.5, {x:Math.random()*100, y:Math.random()*100, z:Math.random()*100, ease:"Linear.easeNone", delay:delay, onCompleteParams:[plane], onComplete:function(p) {
                     var addlRotation = p.rotation.z + ((Math.random()*90-90)*(Math.PI/180));
-                    TweenLite.to(p.rotation, Math.random()*0.5, {z:addlRotation})
+                    TweenMax.to(p.rotation, Math.random()*0.5, {z:addlRotation});
+                    TweenMax.to(p.position, 0.05+Math.random()*0.05, {z:Math.random()*5, ease:"Sine.easeOut", yoyo:true, repeat:1});
                 }});
 
                 planes.push(plane);
@@ -101,7 +91,8 @@
 
 
             // in order to see what's in our scene, we need a light source
-            var pointerOne = new THREE.PointLight(0xFFFFFF);
+//            var pointerOne = new THREE.PointLight(0xFFFFFF);
+            var pointerOne = new THREE.HemisphereLight(0xffffbb, 0x080820, 1.1);
             pointerOne.position.set(-100,-90,130);
 
             // add the light to the scene

@@ -20,8 +20,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
 
-            var mouseX = 0,
-                mouseY = 0;
+            var mousePos;
 
             // renderer
             var renderer = new THREE.WebGLRenderer();
@@ -84,7 +83,7 @@
                 TweenMax.from(plane.rotation, 4.5, {x:Math.random()*100, y:Math.random()*100, z:Math.random()*100, ease:"Linear.easeNone", delay:delay, onCompleteParams:[plane], onComplete:function(p) {
 
 
-                    if (Math.random() < 0.5) {
+                    if (Math.random() < 0.3) {
                         var rando = (Math.random() * 0.15) + 0.05;
                         TweenMax.to(p.position, rando, {z:Math.random()*15, ease:"Sine.easeOut", yoyo:true, repeat:1});
                         TweenMax.to(p.rotation, rando*2, {x:180*(Math.PI/180)});
@@ -109,26 +108,59 @@
 
             var render = function () {
                 requestAnimationFrame(render);
+
+                if (mousePos) {
+                    var affinity = 10;
+                    for (var i = 0; i < planes.length; i++) {
+                        var planeProx = calculateMouseProximity(planes[i]);
+                        if ((planeProx.x > 0 && planeProx.x < affinity) && (planeProx.y > -affinity && planeProx.y < affinity)) {
+                            planes[i].position.x = mousePos.x - affinity;
+                        } else if ((planeProx.x > -affinity && planeProx.x < 0) && (planeProx.y > -affinity && planeProx.y < affinity)) {
+                            planes[i].position.x = mousePos.x + affinity;
+                        }
+                        if ((planeProx.x > -affinity && planeProx.x < affinity) && (planeProx.y > -affinity && planeProx.y < 0)) {
+                            planes[i].position.y = mousePos.y + affinity;
+                        } else if ((planeProx.x > -affinity && planeProx.x < affinity) && (planeProx.y > 0 && planeProx.y < affinity)) {
+                            planes[i].position.y = mousePos.y - affinity;
+                        }
+                    }
+                }
+
                 renderer.render(scene, camera);
             }
 
-//            for (var i = 0; i < planes.length; i++) {
-//                planes[i].rotation.z = -calculatePlaneRotation(planes[i].position.x, planes[i].position.y)*(Math.PI/180);
-//                    planes[i].rotation.z = calculatePlaneRotation(planes[i].position.x, planes[i].position.y);
-//                    console.log(planes[i].rotation.z);
-//            }
+            function calculateMouseProximity(obj) {
 
-//            function calculatePlaneRotation(x, y) {
-//                console.log("(" + x + ", " + y + ") atan = " + Math.atan((y)/(x)));
-//                return Math.atan((y-window.innerHeight/2)/(x-window.innerWidth/2));
-//            }
+                var proximity = {x:0, y:0};
+
+                proximity.x = mousePos.x - obj.position.x;
+                proximity.y = mousePos.y - obj.position.y;
+
+                return proximity;
+            }
 
             render();
 
-//            document.onmousemove = function (e) {
-//                mouseX = e.clientX - window.innerWidth/2;
-//                mouseY = e.clientY - window.innerHeight/2;
-//            };
+            document.onmousemove = function (e) {
+
+                var vector = new THREE.Vector3();
+
+                vector.set(
+                        ( e.clientX / window.innerWidth ) * 2 - 1,
+                        - ( e.clientY / window.innerHeight ) * 2 + 1,
+                        0.5 );
+
+                vector.unproject( camera );
+
+                var dir = vector.sub( camera.position ).normalize();
+
+                var distance = - camera.position.z / dir.z;
+
+                mousePos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+            };
+
+//            var axisHelper = new THREE.AxisHelper( 5 );
+//            scene.add( axisHelper );
 
         });
 

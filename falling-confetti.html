@@ -113,15 +113,20 @@
                     var affinity = 10;
                     for (var i = 0; i < planes.length; i++) {
                         var planeProx = calculateMouseProximity(planes[i]);
+                        var amt = 1;
                         if ((planeProx.x > 0 && planeProx.x < affinity) && (planeProx.y > -affinity && planeProx.y < affinity)) {
-                            planes[i].position.x = mousePos.x - affinity;
+                            amt = (Math.abs(planeProx.x) < 1) ? (1/affinity) : Math.abs(planeProx.x) / affinity;
+                            planes[i].position.x -= amt;
                         } else if ((planeProx.x > -affinity && planeProx.x < 0) && (planeProx.y > -affinity && planeProx.y < affinity)) {
-                            planes[i].position.x = mousePos.x + affinity;
+                            amt = (Math.abs(planeProx.x) < 1) ? (1/affinity) : Math.abs(planeProx.x) / affinity;
+                            planes[i].position.x += amt;
                         }
                         if ((planeProx.x > -affinity && planeProx.x < affinity) && (planeProx.y > -affinity && planeProx.y < 0)) {
-                            planes[i].position.y = mousePos.y + affinity;
+                            amt = (Math.abs(planeProx.y) < 1) ? (1/affinity) : Math.abs(planeProx.y) / affinity;
+                            planes[i].position.y += amt;
                         } else if ((planeProx.x > -affinity && planeProx.x < affinity) && (planeProx.y > 0 && planeProx.y < affinity)) {
-                            planes[i].position.y = mousePos.y - affinity;
+                            amt = (Math.abs(planeProx.y) < 1) ? (1/affinity) : Math.abs(planeProx.y) / affinity;
+                            planes[i].position.y -= amt;
                         }
                     }
                 }

@@ -46,17 +46,7 @@ define(function (require) {
                 // add a material to the mesh
                 var randomColor = planeColors[Math.floor(Math.random() * planeColors.length)];
 
-                var material;
-                //if (randomColor == 0x98782c) {
-                //    material = new THREE.MeshPhongMaterial({
-                //        color: randomColor,
-                //        emissive: 0x111102,
-                //        specular: randomColor,
-                //        shininess: 100
-                //    });
-                //} else {
-                material = new THREE.MeshBasicMaterial({color: randomColor});
-                //}
+                var material = new THREE.MeshBasicMaterial({color: randomColor});
 
                 // create a mesh by combining the geometry and material
                 var plane = new THREE.Mesh(geometry, material);
